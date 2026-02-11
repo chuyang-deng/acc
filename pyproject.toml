@@ -1,6 +1,6 @@
 [project]
 name = "claude-command-center"
-version = "0.1.0"
+version = "0.1.1"
 description = "A TUI to monitor and manage coding agent sessions (Claude, OpenCode, Codex, Aider, Gemini) running in tmux"
 requires-python = ">=3.11"
 dependencies = [

@@ -3,8 +3,8 @@ class Ccc < Formula
 
   desc "TUI to monitor coding agent sessions (Claude, OpenCode, Codex, Aider, Gemini) in tmux"
   homepage "https://github.com/cyy/ccc"
-  url "file://#{Dir.home}/repos/ccc/dist/claude_command_center-0.1.0.tar.gz"
-  sha256 "6a77ce1f9e1ae2bdf87482001b8412d96da35df95d4037cc442e5100145a7e5b"
+  url "file://#{Dir.home}/repos/ccc/dist/claude_command_center-0.1.1.tar.gz"
+  sha256 "a46f7722f41974f3ac68ee39db5b67339caa652841d0d1bb98f9465a706575cd"
   license "MIT"
 
   depends_on "python@3.13"

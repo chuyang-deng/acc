@@ -198,6 +198,67 @@ class LinkPickerScreen(ModalScreen[str | None]):
 
 
 # ──────────────────────────────────────────────────────────────────
+# Input dialog — for sending text to the agent
+# ──────────────────────────────────────────────────────────────────
+
+
+class InputScreen(ModalScreen[str | None]):
+    """Modal for sending input to a session."""
+
+    DEFAULT_CSS = """
+    InputScreen {
+        align: center middle;
+    }
+
+    InputScreen #input-container {
+        width: 60;
+        height: auto;
+        max-height: 10;
+        background: $surface;
+        border: thick $primary;
+        padding: 1 2;
+    }
+
+    InputScreen .input-title {
+        text-style: bold;
+        color: #bb86fc;
+        margin-bottom: 1;
+    }
+
+    InputScreen Input {
+        margin: 0 0 1 0;
+    }
+    """
+
+    BINDINGS = [
+        Binding("escape", "cancel", "Cancel"),
+    ]
+
+    def __init__(self, target_name: str) -> None:
+        super().__init__()
+        self._target_name = target_name
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="input-container"):
+            yield Static(f"Send to {self._target_name}", classes="input-title")
+            yield Input(placeholder="Type command/response...", id="input-box")
+            yield Static(
+                "Press Enter to send, Escape to cancel",
+                classes="dialog-hint",
+            )
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        value = event.value.strip()
+        if value:
+            self.dismiss(value)
+        else:
+            self.dismiss(None)
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+
+# ──────────────────────────────────────────────────────────────────
 # Main App
 # ──────────────────────────────────────────────────────────────────
 
@@ -228,6 +289,7 @@ class CCCApp(App):
         Binding("q", "quit", "Quit"),
         Binding("n", "spawn", "New Session"),
         Binding("enter", "jump", "Jump to Pane"),
+        Binding("i", "send_input", "Input"),
         Binding("o", "open_link", "Open Link"),
         Binding("r", "refresh", "Refresh"),
         Binding("j", "cursor_down", "Down", show=False),
@@ -345,6 +407,32 @@ class CCCApp(App):
 
         # Exit the TUI and attach to the tmux pane
         self.exit(result=("jump", session.pane_id, session.session_name))
+
+    def action_send_input(self) -> None:
+        """Open input dialog to send text to the selected session."""
+        table = self.query_one(SessionTable)
+        session = table.get_selected_session()
+        if session is None:
+            self.bell()
+            return
+
+        self.push_screen(
+            InputScreen(session.display_name),
+            callback=lambda res: self._on_input_sent(session.pane_id, res),
+        )
+
+    def _on_input_sent(self, pane_id: str, text: str | None) -> None:
+        """Send text to the tmux pane."""
+        if not text:
+            return
+        
+        # Send text + Enter to the pane
+        subprocess.run(
+            ["tmux", "send-keys", "-t", pane_id, text, "Enter"],
+            check=False,
+        )
+        # Force a refresh to see the reaction
+        self._poll()
 
     def action_spawn(self) -> None:
         """Open the spawn dialog to create a new Claude session."""
