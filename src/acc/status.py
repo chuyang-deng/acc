@@ -37,7 +37,7 @@ _STATUS_ICONS = {
 _STATUS_LABELS = {
     SessionStatus.WORKING: "Working",
     SessionStatus.IDLE: "Idle",
-    SessionStatus.NEEDS_ATTENTION: "Needs input",
+    SessionStatus.NEEDS_ATTENTION: "Input",
     SessionStatus.DONE: "Done",
     SessionStatus.CRASHED: "Crashed",
 }
@@ -83,15 +83,17 @@ def detect_status(
         detector.working_patterns if detector else _DEFAULT_WORKING_PATTERNS
     )
 
-    # Check for attention patterns
-    for pat in attention_patterns:
-        if pat.search(tail):
-            return SessionStatus.NEEDS_ATTENTION
-
-    # Check for active working indicators
+    # Check for active working indicators FIRST — a visible spinner/progress
+    # means the agent is busy even if its input prompt is also visible
+    # (e.g. Claude always shows ❯ prompt, even while compacting).
     for pat in working_patterns:
         if pat.search(tail):
             return SessionStatus.WORKING
+
+    # Only check attention patterns if no working indicator was found
+    for pat in attention_patterns:
+        if pat.search(tail):
+            return SessionStatus.NEEDS_ATTENTION
 
     # Check idle timeout
     elapsed = time.time() - last_output_time
