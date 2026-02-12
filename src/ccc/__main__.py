@@ -5,18 +5,15 @@ import subprocess
 from ccc.app import CCCApp
 
 
-def _switch_to_pane(pane_id: str, session_name: str) -> None:
-    """Switch the tmux client to the given pane."""
+def _jump_to_pane(pane_id: str, session_name: str) -> None:
+    """Attach the user's terminal to the tmux session at the given pane.
+
+    1. select-window/pane so the right window is shown on attach
+    2. attach-session blocks until user detaches (Ctrl-b d)
+    """
     subprocess.run(["tmux", "select-window", "-t", pane_id], check=False)
     subprocess.run(["tmux", "select-pane", "-t", pane_id], check=False)
-
-    # Try switch-client first (works inside tmux), fall back to attach
-    r = subprocess.run(
-        ["tmux", "switch-client", "-t", session_name],
-        capture_output=True,
-    )
-    if r.returncode != 0:
-        subprocess.run(["tmux", "attach-session", "-t", session_name], check=False)
+    subprocess.run(["tmux", "attach-session", "-t", session_name])
 
 
 def main() -> None:
@@ -26,13 +23,9 @@ def main() -> None:
 
         if isinstance(result, tuple) and result[0] == "jump":
             _, pane_id, session_name = result
-            _switch_to_pane(pane_id, session_name)
-            # Loop: ccc restarts automatically.
-            # - Inside tmux: switch-client changes the visible window,
-            #   ccc restarts in its own window in the background.
-            #   User returns with Ctrl-b l and ccc is already running.
-            # - Outside tmux: attach-session blocks until detach,
-            #   then ccc restarts when user comes back.
+            _jump_to_pane(pane_id, session_name)
+            # attach-session blocks until user detaches (Ctrl-b d).
+            # When they detach, ccc restarts automatically.
             continue
         else:
             break  # Normal quit (q)
