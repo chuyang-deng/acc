@@ -1,13 +1,13 @@
-class Ccc < Formula
+class Acc < Formula
   include Language::Python::Virtualenv
 
-  desc "TUI to monitor coding agent sessions (Claude, OpenCode, Codex, Aider, Gemini) in tmux"
-  homepage "https://github.com/cyy/ccc"
-  url "file://#{Dir.home}/repos/ccc/dist/claude_command_center-0.1.2.tar.gz"
+  desc "Agent Command Center — monitor and manage AI coding agent sessions"
+  homepage "https://github.com/chuyangdeng/acc"
+  url "file://#{Dir.home}/repos/ccc/dist/agent_command_center-0.1.2.tar.gz"
   sha256 "3e018efba451bf3ad05037fd9eafa4da81cc60d49db6830cf8eedfa65d5ce9ea"
-  license "MIT"
+  license "AGPL-3.0-only"
 
-  depends_on "python@3.13"
+  depends_on "python@3.11"
   depends_on "tmux"
 
   resource "textual" do
@@ -36,17 +36,17 @@ class Ccc < Formula
 
   def caveats
     <<~EOS
-      ccc requires tmux to be running with coding agent sessions.
-      Start agents in tmux windows, then run `ccc` to monitor them.
+      acc requires tmux to be running with coding agent sessions.
+      Start agents in tmux windows, then run `acc` to monitor them.
 
       Supported agents: Claude, OpenCode, Codex, Aider, Gemini/Antigravity
       Optional: Set ANTHROPIC_API_KEY for LLM-powered session summaries.
 
-      Config: ~/.config/ccc/config.yaml
+      Config: ~/.config/acc/config.yaml
     EOS
   end
 
   test do
-    assert_match "ccc", shell_output("#{bin}/ccc --help 2>&1", 2)
+    assert_match "acc", shell_output("#{bin}/acc --help 2>&1", 2)
   end
 end

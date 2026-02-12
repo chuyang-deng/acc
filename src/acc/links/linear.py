@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from ccc.links.base import LinkPlugin
+from acc.links.base import LinkPlugin
 
 
 class LinearPlugin(LinkPlugin):

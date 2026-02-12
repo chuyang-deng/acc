@@ -9,15 +9,15 @@ from pathlib import Path
 import yaml
 
 
-DEFAULT_CONFIG_PATH = Path.home() / ".config" / "ccc" / "config.yaml"
+DEFAULT_CONFIG_PATH = Path.home() / ".config" / "acc" / "config.yaml"
 
 
 @dataclass
-class CCCConfig:
+class ACCConfig:
     """Application configuration."""
 
     claude_path: str = "claude"
-    tmux_session: str = "ccc"
+    tmux_session: str = "acc"
     refresh_interval: int = 3
     summary_interval: int = 60
     summary_model: str = "haiku"
@@ -27,7 +27,7 @@ class CCCConfig:
     agents: list[dict] = field(default_factory=list)
 
     @classmethod
-    def load(cls, config_path: Path | None = None) -> CCCConfig:
+    def load(cls, config_path: Path | None = None) -> ACCConfig:
         """Load config from YAML file, then overlay environment variables."""
         path = config_path or DEFAULT_CONFIG_PATH
         data: dict = {}
@@ -51,13 +51,13 @@ class CCCConfig:
         # Environment variables override config file values
         if env_claude := os.environ.get("CLAUDE_PATH"):
             config.claude_path = env_claude
-        if env_session := os.environ.get("CCC_TMUX_SESSION"):
+        if env_session := os.environ.get("ACC_TMUX_SESSION"):
             config.tmux_session = env_session
-        if env_refresh := os.environ.get("CCC_REFRESH_INTERVAL"):
+        if env_refresh := os.environ.get("ACC_REFRESH_INTERVAL"):
             config.refresh_interval = int(env_refresh)
-        if env_summary := os.environ.get("CCC_SUMMARY_INTERVAL"):
+        if env_summary := os.environ.get("ACC_SUMMARY_INTERVAL"):
             config.summary_interval = int(env_summary)
-        if env_model := os.environ.get("CCC_MODEL"):
+        if env_model := os.environ.get("ACC_MODEL"):
             config.summary_model = env_model
 
         return config

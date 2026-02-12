@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from ccc.links.base import DetectedLink, LinkPlugin
-from ccc.links.github import GitHubIssuePlugin, GitHubPRPlugin, GitHubRepoPlugin
-from ccc.links.linear import LinearPlugin
-from ccc.links.localhost import LocalhostPlugin
-from ccc.links.generic import GenericURLPlugin
-from ccc.links.custom import load_custom_plugins
+from acc.links.base import DetectedLink, LinkPlugin
+from acc.links.github import GitHubIssuePlugin, GitHubPRPlugin, GitHubRepoPlugin
+from acc.links.linear import LinearPlugin
+from acc.links.localhost import LocalhostPlugin
+from acc.links.generic import GenericURLPlugin
+from acc.links.custom import load_custom_plugins
 
 
 class LinkRegistry:

@@ -6,14 +6,14 @@ from pathlib import Path
 
 import yaml
 
-from ccc.config import CCCConfig
+from acc.config import ACCConfig
 
 
-class TestCCCConfig:
+class TestACCConfig:
     def test_defaults(self):
-        config = CCCConfig()
+        config = ACCConfig()
         assert config.claude_path == "claude"
-        assert config.tmux_session == "ccc"
+        assert config.tmux_session == "acc"
         assert config.refresh_interval == 3
         assert config.summary_interval == 60
         assert config.summary_model == "haiku"
@@ -33,7 +33,7 @@ class TestCCCConfig:
         with open(config_file, "w") as f:
             yaml.dump(config_data, f)
 
-        config = CCCConfig.load(config_file)
+        config = ACCConfig.load(config_file)
         assert config.claude_path == "/usr/local/bin/claude"
         assert config.tmux_session == "my-claude"
         assert config.refresh_interval == 5
@@ -47,15 +47,15 @@ class TestCCCConfig:
             yaml.dump({"claude_path": "from-yaml"}, f)
 
         monkeypatch.setenv("CLAUDE_PATH", "/env/claude")
-        monkeypatch.setenv("CCC_TMUX_SESSION", "env-session")
-        monkeypatch.setenv("CCC_REFRESH_INTERVAL", "10")
+        monkeypatch.setenv("ACC_TMUX_SESSION", "env-session")
+        monkeypatch.setenv("ACC_REFRESH_INTERVAL", "10")
 
-        config = CCCConfig.load(config_file)
+        config = ACCConfig.load(config_file)
         assert config.claude_path == "/env/claude"
         assert config.tmux_session == "env-session"
         assert config.refresh_interval == 10
 
     def test_missing_file_uses_defaults(self):
-        config = CCCConfig.load(Path("/nonexistent/path/config.yaml"))
+        config = ACCConfig.load(Path("/nonexistent/path/config.yaml"))
         assert config.claude_path == "claude"
-        assert config.tmux_session == "ccc"
+        assert config.tmux_session == "acc"

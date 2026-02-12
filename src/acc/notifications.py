@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ccc.status import SessionStatus
+from acc.status import SessionStatus
 
 if TYPE_CHECKING:
-    from ccc.discovery import Session
+    from acc.discovery import Session
 
 
 # Transitions that should trigger a notification

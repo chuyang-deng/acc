@@ -1,8 +1,8 @@
-"""Entry point for `python -m ccc` and the `ccc` console script."""
+"""Entry point for `python -m acc` and the `acc` console script."""
 
 import subprocess
 
-from ccc.app import CCCApp
+from acc.app import ACCApp
 
 
 def _jump_to_pane(pane_id: str, session_name: str) -> None:
@@ -18,14 +18,14 @@ def _jump_to_pane(pane_id: str, session_name: str) -> None:
 
 def main() -> None:
     while True:
-        app = CCCApp()
+        app = ACCApp()
         result = app.run()
 
         if isinstance(result, tuple) and result[0] == "jump":
             _, pane_id, session_name = result
             _jump_to_pane(pane_id, session_name)
             # attach-session blocks until user detaches (Ctrl-b d).
-            # When they detach, ccc restarts automatically.
+            # When they detach, acc restarts automatically.
             continue
         else:
             break  # Normal quit (q)

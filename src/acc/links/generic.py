@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from urllib.parse import urlparse
 
-from ccc.links.base import LinkPlugin
+from acc.links.base import LinkPlugin
 
 
 class GenericURLPlugin(LinkPlugin):

@@ -5,9 +5,9 @@ from __future__ import annotations
 from textual.widgets import DataTable
 from textual.message import Message
 
-from ccc.columns import ColumnRegistry, create_default_registry
-from ccc.discovery import Session
-from ccc.status import SessionStatus
+from acc.columns import ColumnRegistry, create_default_registry
+from acc.discovery import Session
+from acc.status import SessionStatus
 
 
 class SessionSelected(Message):

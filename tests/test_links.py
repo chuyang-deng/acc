@@ -1,10 +1,10 @@
 """Tests for link detection plugins."""
 
-from ccc.links import LinkRegistry
-from ccc.links.github import GitHubPRPlugin, GitHubIssuePlugin
-from ccc.links.linear import LinearPlugin
-from ccc.links.localhost import LocalhostPlugin
-from ccc.links.custom import load_custom_plugins
+from acc.links import LinkRegistry
+from acc.links.github import GitHubPRPlugin, GitHubIssuePlugin
+from acc.links.linear import LinearPlugin
+from acc.links.localhost import LocalhostPlugin
+from acc.links.custom import load_custom_plugins
 
 
 class TestGitHubPR:

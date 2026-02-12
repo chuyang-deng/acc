@@ -2,8 +2,8 @@
 
 import time
 
-from ccc.agents import ClaudeDetector, OpenCodeDetector, CodexDetector, AiderDetector
-from ccc.status import SessionStatus, detect_status, content_changed
+from acc.agents import ClaudeDetector, OpenCodeDetector, CodexDetector, AiderDetector
+from acc.status import SessionStatus, detect_status, content_changed
 
 
 class TestDetectStatus:

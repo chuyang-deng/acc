@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from textual.widgets import Static
 
-from ccc.discovery import Session
+from acc.discovery import Session
 
 
 class DetailPanel(Static):

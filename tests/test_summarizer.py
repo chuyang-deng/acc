@@ -1,6 +1,6 @@
 """Tests for the LLM summarizer."""
 
-from ccc.summarizer import Summarizer, SessionSummary
+from acc.summarizer import Summarizer, SessionSummary
 
 
 class TestSummarizerParsing:

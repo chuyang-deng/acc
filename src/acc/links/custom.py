@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ccc.links.base import LinkPlugin
+from acc.links.base import LinkPlugin
 
 
 def load_custom_plugins(link_configs: list[dict]) -> list[LinkPlugin]:

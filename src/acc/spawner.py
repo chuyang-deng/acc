@@ -1,11 +1,11 @@
-"""Session spawner — create new Claude/opencode sessions in tmux panes."""
+"""Session spawner — create new Agent sessions in tmux panes."""
 
 from __future__ import annotations
 
 import re
 import subprocess
 
-from ccc.config import CCCConfig
+from acc.config import ACCConfig
 
 
 def _slugify(text: str) -> str:
@@ -40,9 +40,9 @@ def spawn_session(
     working_dir: str,
     goal: str,
     extra_args: list[str] | None = None,
-    config: CCCConfig | None = None,
+    config: ACCConfig | None = None,
 ) -> str | None:
-    """Spawn a new Claude/opencode session in a tmux window.
+    """Spawn a new Agent session in a tmux window.
 
     Args:
         working_dir: Directory to cd into.
@@ -54,7 +54,7 @@ def spawn_session(
         The pane ID of the new session, or None on failure.
     """
     if config is None:
-        config = CCCConfig()
+        config = ACCConfig()
 
     session_name = config.tmux_session
     claude_path = config.claude_path

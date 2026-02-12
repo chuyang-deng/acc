@@ -1,4 +1,4 @@
-"""Main Textual application — Claude Command Center."""
+"""Main Textual application — Agent Command Center."""
 
 from __future__ import annotations
 
@@ -13,17 +13,17 @@ from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Footer, Input, Label, Static
 
-from ccc.agents import AgentRegistry
-from ccc.config import CCCConfig
-from ccc.discovery import SessionRegistry, capture_pane, discover_panes
-from ccc.links import LinkRegistry
-from ccc.notifications import NotificationManager
-from ccc.spawner import spawn_session
-from ccc.status import SessionStatus, content_changed, detect_status
-from ccc.summarizer import Summarizer
-from ccc.widgets.detail_panel import DetailPanel
-from ccc.widgets.header import CCCHeader
-from ccc.widgets.session_table import SessionSelected, SessionTable
+from acc.agents import AgentRegistry
+from acc.config import ACCConfig
+from acc.discovery import SessionRegistry, capture_pane, discover_panes
+from acc.links import LinkRegistry
+from acc.notifications import NotificationManager
+from acc.spawner import spawn_session
+from acc.status import SessionStatus, content_changed, detect_status
+from acc.summarizer import Summarizer
+from acc.widgets.detail_panel import DetailPanel
+from acc.widgets.header import ACCHeader
+from acc.widgets.session_table import SessionSelected, SessionTable
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ from ccc.widgets.session_table import SessionSelected, SessionTable
 
 
 class SpawnDialog(ModalScreen[dict | None]):
-    """Modal dialog for spawning a new Claude session."""
+    """Modal dialog for spawning a new Agent session."""
 
     DEFAULT_CSS = """
     SpawnDialog {
@@ -82,7 +82,7 @@ class SpawnDialog(ModalScreen[dict | None]):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="dialog-container"):
-            yield Static("⚡ New Claude Session", classes="dialog-title")
+            yield Static("⚡ New Agent Session", classes="dialog-title")
             yield Label("Working directory:", classes="dialog-label")
             yield Input(
                 value=self._default_dir,
@@ -103,7 +103,7 @@ class SpawnDialog(ModalScreen[dict | None]):
             self._step = 1
             # Switch to goal input
             label = self.query_one(".dialog-label", Label)
-            label.update("Goal / initial prompt for Claude:")
+            label.update("Goal / initial prompt for Agent:")
             inp = self.query_one(Input)
             inp.value = ""
             inp.placeholder = "e.g. Fix the flaky auth tests"
@@ -115,7 +115,7 @@ class SpawnDialog(ModalScreen[dict | None]):
             self._data["goal"] = value
             self._step = 2
             label = self.query_one(".dialog-label", Label)
-            label.update("Additional claude args (optional):")
+            label.update("Additional agent args (optional):")
             inp = self.query_one(Input)
             inp.value = ""
             inp.placeholder = "e.g. --model opus --resume abc123"
@@ -263,10 +263,10 @@ class InputScreen(ModalScreen[str | None]):
 # ──────────────────────────────────────────────────────────────────
 
 
-class CCCApp(App):
-    """Claude Command Center — monitor and manage Claude Code sessions."""
+class ACCApp(App):
+    """Agent Command Center — monitor and manage Agent Code sessions."""
 
-    TITLE = "Claude Command Center"
+    TITLE = "Agent Command Center"
 
     CSS = """
     Screen {
@@ -298,7 +298,7 @@ class CCCApp(App):
 
     def __init__(self) -> None:
         super().__init__()
-        self.config = CCCConfig.load()
+        self.config = ACCConfig.load()
         self.registry = SessionRegistry()
         self.agent_registry = AgentRegistry(self.config.agents)
         self.link_registry = LinkRegistry(self.config.links)
@@ -310,7 +310,7 @@ class CCCApp(App):
         self._poll_timer = None
 
     def compose(self) -> ComposeResult:
-        yield CCCHeader()
+        yield ACCHeader()
         with Vertical(id="main-container"):
             yield SessionTable()
             yield DetailPanel()
@@ -367,7 +367,7 @@ class CCCApp(App):
             self.notifications.ring_bell()
 
         # Update UI
-        header = self.query_one(CCCHeader)
+        header = self.query_one(ACCHeader)
         header.update_counts(len(sessions), self.notifications.badge_count)
 
         table = self.query_one(SessionTable)
@@ -410,7 +410,7 @@ class CCCApp(App):
         session.needs_attention_notified = False
 
         # Exit the TUI, then __main__.py will switch the tmux window
-        # and restart ccc so it's ready when the user comes back.
+        # and restart acc so it's ready when the user comes back.
         self.exit(result=("jump", session.pane_id, session.session_name))
 
     def action_send_input(self) -> None:
@@ -440,7 +440,7 @@ class CCCApp(App):
         self._poll()
 
     def action_spawn(self) -> None:
-        """Open the spawn dialog to create a new Claude session."""
+        """Open the spawn dialog to create a new Agent session."""
         recent = self.config.recent_dirs
         default_dir = recent[0] if recent else os.getcwd()
         self.push_screen(SpawnDialog(default_dir), callback=self._on_spawn_result)

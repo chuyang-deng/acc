@@ -8,9 +8,9 @@ from dataclasses import dataclass, field
 
 import psutil
 
-from ccc.agents import AgentDetector, AgentRegistry
-from ccc.links import DetectedLink
-from ccc.status import SessionStatus
+from acc.agents import AgentDetector, AgentRegistry
+from acc.links import DetectedLink
+from acc.status import SessionStatus
 
 
 @dataclass

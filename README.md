@@ -1,4 +1,4 @@
-# ⚡ Claude Command Center (`ccc`)
+# ⚡ Agent Command Center (`acc`)
 
 A Python+Textual TUI that monitors and manages independent AI coding agent sessions (Claude Code, OpenCode, Codex, Aider, etc.) running in tmux panes. See all sessions at a glance, track status, surface links, and jump into any session when needed.
 
@@ -20,17 +20,17 @@ A Python+Textual TUI that monitors and manages independent AI coding agent sessi
 uv tool install .
 
 # Or run directly
-uv run ccc
+uv run acc
 ```
 
 ## Usage
 
 ```bash
 # Launch the command center
-ccc
+acc
 
 # With custom claude path
-CLAUDE_PATH=~/.local/bin/claude ccc
+CLAUDE_PATH=~/.local/bin/claude acc
 ```
 
 ### Keybindings
@@ -46,11 +46,11 @@ CLAUDE_PATH=~/.local/bin/claude ccc
 
 ## Configuration
 
-Create `~/.config/ccc/config.yaml`:
+Create `~/.config/acc/config.yaml`:
 
 ```yaml
 claude_path: claude
-tmux_session: ccc
+tmux_session: acc
 refresh_interval: 3
 summary_interval: 60
 summary_model: haiku
@@ -78,10 +78,10 @@ agents:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CLAUDE_PATH` | `claude` | Path to claude binary |
-| `CCC_TMUX_SESSION` | `ccc` | Tmux session for spawned panes |
-| `CCC_REFRESH_INTERVAL` | `3` | Poll interval (seconds) |
-| `CCC_SUMMARY_INTERVAL` | `60` | LLM re-summarization interval |
-| `CCC_MODEL` | `haiku` | Model for summarization |
+| `ACC_TMUX_SESSION` | `acc` | Tmux session for spawned panes |
+| `ACC_REFRESH_INTERVAL` | `3` | Poll interval (seconds) |
+| `ACC_SUMMARY_INTERVAL` | `60` | LLM re-summarization interval |
+| `ACC_MODEL` | `haiku` | Model for summarization |
 
 ## Development
 
@@ -96,12 +96,12 @@ To verify the installation and functionality:
 
 1. **Start a test session:**
    ```bash
-   tmux new-session -d -s test-ccc "echo 'Simulating agent...'; sleep 3600"
+   tmux new-session -d -s test-acc "echo 'Simulating agent...'; sleep 3600"
    ```
 
-2. **Run ccc:**
+2. **Run acc:**
    ```bash
-   ccc
+   acc
    ```
    You should see the "Simon Says..." session listed.
 

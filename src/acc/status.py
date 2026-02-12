@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from enum import Enum
 
-from ccc.agents import AgentDetector
+from acc.agents import AgentDetector
 
 
 class SessionStatus(Enum):

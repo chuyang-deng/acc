@@ -8,11 +8,11 @@ from textual.widget import Widget
 from textual.widgets import Static
 
 
-class CCCHeader(Widget):
+class ACCHeader(Widget):
     """Top header bar with title, session count, and attention badge."""
 
     DEFAULT_CSS = """
-    CCCHeader {
+    ACCHeader {
         dock: top;
         height: 3;
         background: $primary-darken-3;
@@ -20,7 +20,7 @@ class CCCHeader(Widget):
         padding: 0 2;
     }
 
-    CCCHeader .header-title {
+    ACCHeader .header-title {
         width: 1fr;
         content-align: left middle;
         text-style: bold;
@@ -28,14 +28,14 @@ class CCCHeader(Widget):
         padding: 1 0;
     }
 
-    CCCHeader .header-info {
+    ACCHeader .header-info {
         width: auto;
         content-align: right middle;
         padding: 1 0;
         color: $text-muted;
     }
 
-    CCCHeader .header-badge {
+    ACCHeader .header-badge {
         width: auto;
         content-align: right middle;
         padding: 1 2;
@@ -51,7 +51,7 @@ class CCCHeader(Widget):
 
     def compose(self) -> ComposeResult:
         with Horizontal():
-            yield Static("⚡ Claude Command Center", classes="header-title")
+            yield Static("⚡ Agent Command Center", classes="header-title")
             yield Static("0 sessions", id="session-count", classes="header-info")
             yield Static("", id="badge", classes="header-badge")
 
