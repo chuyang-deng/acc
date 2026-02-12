@@ -386,12 +386,15 @@ class ACCApp(App):
         self.agent_registry = AgentRegistry(self.config.agents)
         self.link_registry = LinkRegistry(self.config.links)
         self.notifications = NotificationManager()
+        # Initialize summarizer
         self.summarizer = Summarizer(
             model=self.config.summary_model,
             interval=self.config.summary_interval,
             api_key=self.config.llm_api_key,
             base_url=self.config.llm_base_url,
+            provider=self.config.llm_provider,
         )
+        self.pending_tasks: set[str] = set()
         self._poll_timer = None
 
     def compose(self) -> ComposeResult:
@@ -407,6 +410,16 @@ class ACCApp(App):
         self._poll_timer = self.set_interval(
             self.config.refresh_interval, self._poll
         )
+
+    def _background_summarize(self, pane_id: str, content: str) -> None:
+        """Run summarization in a worker thread."""
+        try:
+            # force=True because we already checked should_refresh before calling this
+            self.summarizer.summarize(pane_id, content, force=True)
+        except Exception:
+            pass
+        finally:
+            self.pending_tasks.discard(pane_id)
 
     def _poll(self) -> None:
         """Discover sessions, update statuses, and refresh the UI."""
@@ -436,13 +449,21 @@ class ACCApp(App):
             )
 
             # LLM summarization (async-friendly — runs in background)
-            if self.summarizer.should_refresh(pane_id):
+            # 1. Check if we should start a new summarization task
+            if (
+                pane_id not in self.pending_tasks
+                and self.summarizer.should_refresh(pane_id)
+            ):
+                self.pending_tasks.add(pane_id)
                 long_content = capture_pane(pane_id, lines=200)
-                summary = self.summarizer.summarize(pane_id, long_content)
-                if summary:
-                    session.goal = summary.goal
-                    session.progress = summary.progress
-            elif cached := self.summarizer.get_cached(pane_id):
+                
+                def job():
+                    self._background_summarize(pane_id, long_content)
+
+                self.run_worker(job, thread=True, group="summarizer")
+
+            # 2. Always update session from cache if available (worker populates cache)
+            if cached := self.summarizer.get_cached(pane_id):
                 session.goal = session.goal or cached.goal
                 session.progress = session.progress or cached.progress
 
@@ -452,16 +473,20 @@ class ACCApp(App):
             self.notifications.ring_bell()
 
         # Update UI
-        header = self.query_one(ACCHeader)
-        header.update_counts(len(sessions), self.notifications.badge_count)
+        try:
+            header = self.query_one(ACCHeader)
+            header.update_counts(len(sessions), self.notifications.badge_count)
 
-        table = self.query_one(SessionTable)
-        table.refresh_sessions(sessions)
+            table = self.query_one(SessionTable)
+            table.refresh_sessions(sessions)
 
-        # Update detail panel for current selection
-        selected = table.get_selected_session()
-        detail = self.query_one(DetailPanel)
-        detail.show_session(selected)
+            # Update detail panel for current selection
+            selected = table.get_selected_session()
+            detail = self.query_one(DetailPanel)
+            detail.show_session(selected)
+        except Exception:
+            # UI elements might be unmounted (e.g. during exit)
+            pass
 
     # ── Keybinding actions ───────────────────────────────────────
 

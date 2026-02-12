@@ -28,6 +28,7 @@ class ACCConfig:
     columns: list[dict] = field(default_factory=list)
     llm_api_key: str | None = None
     llm_base_url: str | None = None
+    llm_provider: str = "auto"
 
     @classmethod
     def load(cls, config_path: Path | None = None) -> ACCConfig:
@@ -52,6 +53,7 @@ class ACCConfig:
             columns=data.get("columns", []),
             llm_api_key=data.get("llm_api_key"),
             llm_base_url=data.get("llm_base_url"),
+            llm_provider=data.get("llm_provider", "auto"),
         )
 
         # Environment variables override config file values
@@ -69,5 +71,7 @@ class ACCConfig:
             config.llm_api_key = env_key
         if env_url := os.environ.get("ACC_LLM_BASE_URL"):
             config.llm_base_url = env_url
+        if env_provider := os.environ.get("ACC_LLM_PROVIDER"):
+            config.llm_provider = env_provider
 
         return config

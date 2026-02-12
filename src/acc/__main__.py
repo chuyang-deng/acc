@@ -16,7 +16,24 @@ def _jump_to_pane(pane_id: str, session_name: str) -> None:
     subprocess.run(["tmux", "attach-session", "-t", session_name])
 
 
+
 def main() -> None:
+    import argparse
+    import sys
+    from importlib.metadata import version
+
+    parser = argparse.ArgumentParser(description="Agent Command Center (acc)")
+    parser.add_argument("--version", action="store_true", help="Show version and exit")
+    args = parser.parse_args()
+
+    if args.version:
+        try:
+            v = version("agent-command-center")
+        except Exception:
+            v = "unknown"
+        print(f"acc {v}")
+        sys.exit(0)
+
     while True:
         app = ACCApp()
         result = app.run()

@@ -56,6 +56,10 @@ acc
 
 # With custom claude path
 CLAUDE_PATH=~/.local/bin/claude acc
+
+# View help and version
+acc --help
+acc --version
 ```
 
 ### Keybindings
@@ -131,12 +135,15 @@ columns:
 
 ### LLM Configuration
 
-Use a local LLM or a different provider compatible with Anthropic client (or just set the key):
+By default, `acc` auto-detects the best available provider (Apple Intelligence > Ollama > Anthropic > OpenAI).
+
+You can explicitly configure a provider:
 
 ```yaml
+llm_provider: "ollama" # or "apple", "anthropic", "openai"
 llm_api_key: "sk-..."
-llm_base_url: "https://api.anthropic.com" # or local proxy
-summary_model: "claude-3-opus-20240229"
+llm_base_url: "http://localhost:11434/v1"
+summary_model: "llama3"
 ```
 
 ### Custom Links

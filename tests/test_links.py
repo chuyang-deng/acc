@@ -107,3 +107,17 @@ class TestLinkRegistry:
         }])
         links = registry.scan("Deploy at https://my-app.vercel.app")
         assert any(l.label == "Preview" for l in links)
+
+    def test_ranking_order(self):
+        """Verify that plugins are scanned in priority order."""
+        registry = LinkRegistry()
+        # Text contains localhost (low priority) and GitHub (high priority)
+        text = "Check http://localhost:3000 and https://github.com/user/repo/pull/1"
+        
+        links = registry.scan(text)
+        assert len(links) == 2
+        
+        # GitHub should come first despite being second in text, 
+        # because GitHubPlugin runs before LocalhostPlugin
+        assert links[0].url == "https://github.com/user/repo/pull/1"
+        assert links[1].url == "http://localhost:3000"
