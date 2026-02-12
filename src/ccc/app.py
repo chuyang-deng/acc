@@ -385,6 +385,10 @@ class CCCApp(App):
         detail = self.query_one(DetailPanel)
         detail.show_session(message.session)
 
+    def on_data_table_row_selected(self, event) -> None:
+        """Handle Enter key on a DataTable row — jump to that session."""
+        self.action_jump()
+
     def action_cursor_down(self) -> None:
         table = self.query_one(SessionTable)
         table.action_cursor_down()
