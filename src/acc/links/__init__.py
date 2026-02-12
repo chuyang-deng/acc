@@ -33,8 +33,10 @@ class LinkRegistry:
         seen_urls: set[str] = set()
         for plugin in self.plugins:
             for link in plugin.find_links(text):
-                if link.url not in seen_urls:
-                    seen_urls.add(link.url)
+                # Normalize URL to avoid duplicates (e.g. trailing slash)
+                normalized = link.url.rstrip("/")
+                if normalized not in seen_urls:
+                    seen_urls.add(normalized)
                     results.append(link)
         return results
 
