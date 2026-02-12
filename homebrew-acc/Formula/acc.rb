@@ -3,8 +3,8 @@ class Acc < Formula
 
   desc "Agent Command Center — monitor and manage AI coding agent sessions"
   homepage "https://github.com/chuyang-deng/acc"
-  url "https://github.com/chuyang-deng/acc/archive/refs/tags/v0.1.3.tar.gz"
-  sha256 "dfb5c608580dc665db90f6f6f2df05480d466172b89981bad40c54606ee84326"
+  url "https://github.com/chuyang-deng/acc/archive/refs/tags/v0.1.4.tar.gz"
+  sha256 "293c3d9334acd9e06eb5161b005eae34e14af6efca10bfb4df75119840f6c891"
   license "AGPL-3.0-only"
 
   depends_on "python@3.11"
@@ -107,7 +107,7 @@ class Acc < Formula
       Supported agents: Claude, OpenCode, Codex, Aider, Gemini/Antigravity
       Optional: Set ANTHROPIC_API_KEY for LLM-powered session summaries.
 
-      Config: ~/.config/acc/config.yaml
+      Config: ~/.acc/config.yaml
     EOS
   end
 

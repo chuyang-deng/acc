@@ -71,7 +71,7 @@ CLAUDE_PATH=~/.local/bin/claude acc
 
 ## Configuration
 
-Create `~/.config/acc/config.yaml`:
+Create `~/.acc/config.yaml`:
 
 ```yaml
 claude_path: claude

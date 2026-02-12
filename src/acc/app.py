@@ -14,6 +14,7 @@ from textual.screen import ModalScreen
 from textual.widgets import Footer, Input, Label, Static
 
 from acc.agents import AgentRegistry
+from acc.columns import create_default_registry
 from acc.config import ACCConfig
 from acc.discovery import SessionRegistry, capture_pane, discover_panes
 from acc.links import LinkRegistry
@@ -259,8 +260,89 @@ class InputScreen(ModalScreen[str | None]):
 
 
 # ──────────────────────────────────────────────────────────────────
-# Main App
+# Help dialog — quick reference for keys and config
 # ──────────────────────────────────────────────────────────────────
+
+
+class HelpScreen(ModalScreen):
+    """Modal screen showing keybindings and help."""
+
+    DEFAULT_CSS = """
+    HelpScreen {
+        align: center middle;
+    }
+
+    HelpScreen #help-container {
+        width: 80;
+        height: auto;
+        max-height: 30;
+        background: $surface;
+        border: thick $primary;
+        padding: 1 2;
+    }
+
+    HelpScreen .help-title {
+        text-style: bold;
+        color: #bb86fc;
+        margin-bottom: 1;
+        text-align: center;
+    }
+
+    HelpScreen .help-section {
+        color: $secondary;
+        text-style: bold;
+        margin-top: 1;
+    }
+
+    HelpScreen .help-text {
+        color: $text;
+    }
+    
+    HelpScreen .help-hint {
+        margin-top: 1;
+        color: $text-muted;
+        text-align: center;
+    }
+    """
+
+    BINDINGS = [
+        Binding("escape", "cancel", "Close"),
+        Binding("?", "cancel", "Close"),
+        Binding("h", "cancel", "Close"),
+    ]
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="help-container"):
+            yield Static("Agent Command Center — Help", classes="help-title")
+            
+            yield Static("Keybindings", classes="help-section")
+            yield Static(
+                "  n       Spawn new session\n"
+                "  Enter   Attach to session (tmux)\n"
+                "  i       Send input to session\n"
+                "  o       Open detected link\n"
+                "  r       Refresh summaries\n"
+                "  q       Quit\n"
+                "  ? / h   Show this help",
+                classes="help-text",
+            )
+            
+            yield Static("Configuration", classes="help-section")
+            yield Static(
+                "Config file: ~/.acc/config.yaml\n"
+                "\n"
+                "Features:\n"
+                "  • Customize columns (width, order)\n"
+                "  • Define custom agents (regex patterns)\n"
+                "  • Add custom links (Jira, Linear, etc.)\n"
+                "  • Configure LLM (API key, Base URL, Model)",
+                classes="help-text",
+            )
+            
+            yield Static("Press Escape to close", classes="help-hint")
+
+    def action_cancel(self) -> None:
+        self.dismiss()
 
 
 class ACCApp(App):
@@ -294,6 +376,7 @@ class ACCApp(App):
         Binding("r", "refresh", "Refresh"),
         Binding("j", "cursor_down", "Down", show=False),
         Binding("k", "cursor_up", "Up", show=False),
+        Binding("?", "help", "Help", key_display="?"),
     ]
 
     def __init__(self) -> None:
@@ -306,13 +389,15 @@ class ACCApp(App):
         self.summarizer = Summarizer(
             model=self.config.summary_model,
             interval=self.config.summary_interval,
+            api_key=self.config.llm_api_key,
+            base_url=self.config.llm_base_url,
         )
         self._poll_timer = None
 
     def compose(self) -> ComposeResult:
         yield ACCHeader()
         with Vertical(id="main-container"):
-            yield SessionTable()
+            yield SessionTable(registry=create_default_registry(self.config))
             yield DetailPanel()
         yield Footer()
 
@@ -494,6 +579,10 @@ class ACCApp(App):
         for pane_id in list(self.registry.sessions.keys()):
             self.summarizer.invalidate(pane_id)
         self._poll()
+
+    def action_help(self) -> None:
+        """Show the help screen."""
+        self.push_screen(HelpScreen())
 
 
 def _attach_to_tmux_pane(pane_id: str, session_name: str) -> None:

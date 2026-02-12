@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 
 
-DEFAULT_CONFIG_PATH = Path.home() / ".config" / "acc" / "config.yaml"
+DEFAULT_CONFIG_PATH = Path.home() / ".acc" / "config.yaml"
 
 
 @dataclass
@@ -25,6 +25,9 @@ class ACCConfig:
     recent_dirs: list[str] = field(default_factory=list)
     links: list[dict] = field(default_factory=list)
     agents: list[dict] = field(default_factory=list)
+    columns: list[dict] = field(default_factory=list)
+    llm_api_key: str | None = None
+    llm_base_url: str | None = None
 
     @classmethod
     def load(cls, config_path: Path | None = None) -> ACCConfig:
@@ -46,6 +49,9 @@ class ACCConfig:
             recent_dirs=data.get("recent_dirs", []),
             links=data.get("links", []),
             agents=data.get("agents", []),
+            columns=data.get("columns", []),
+            llm_api_key=data.get("llm_api_key"),
+            llm_base_url=data.get("llm_base_url"),
         )
 
         # Environment variables override config file values
@@ -59,5 +65,9 @@ class ACCConfig:
             config.summary_interval = int(env_summary)
         if env_model := os.environ.get("ACC_MODEL"):
             config.summary_model = env_model
+        if env_key := os.environ.get("ACC_LLM_API_KEY"):
+            config.llm_api_key = env_key
+        if env_url := os.environ.get("ACC_LLM_BASE_URL"):
+            config.llm_base_url = env_url
 
         return config

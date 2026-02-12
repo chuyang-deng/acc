@@ -38,9 +38,17 @@ class SessionSummary:
 class Summarizer:
     """Summarizes pane content using the Anthropic API."""
 
-    def __init__(self, model: str = "claude-haiku-4-20250414", interval: int = 60) -> None:
+    def __init__(
+        self,
+        model: str = "claude-haiku-4-20250414",
+        interval: int = 60,
+        api_key: str | None = None,
+        base_url: str | None = None,
+    ) -> None:
         self.model = model
         self.interval = interval
+        self.api_key = api_key
+        self.base_url = base_url
         self._cache: dict[str, SessionSummary] = {}
         self._client = None
 
@@ -49,7 +57,11 @@ class Summarizer:
         if self._client is None:
             try:
                 import anthropic
-                self._client = anthropic.Anthropic()
+
+                self._client = anthropic.Anthropic(
+                    api_key=self.api_key,
+                    base_url=self.base_url,
+                )
             except Exception as e:
                 logger.warning("Failed to initialize Anthropic client: %s", e)
                 return None

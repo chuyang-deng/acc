@@ -6,7 +6,8 @@ from dataclasses import dataclass
 from typing import Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ccc.discovery import Session
+    from acc.config import ACCConfig
+    from acc.discovery import Session
 
 
 @dataclass
@@ -70,13 +71,51 @@ def _extract_links(session: Session, idx: int) -> str:
     return "—"
 
 
-def create_default_registry() -> ColumnRegistry:
-    """Create a ColumnRegistry with all built-in columns."""
+def create_default_registry(config: ACCConfig | None = None) -> ColumnRegistry:
+    """Create a ColumnRegistry, potentially customized by config."""
     registry = ColumnRegistry()
-    registry.register(ColumnDef(key="#", header="#", width=3, extract=_extract_index))
-    registry.register(ColumnDef(key="status", header="Status", width=12, extract=_extract_status))
-    registry.register(ColumnDef(key="agent", header="Agent", width=10, extract=_extract_agent))
-    registry.register(ColumnDef(key="goal", header="Goal", width=0, extract=_extract_goal))
-    registry.register(ColumnDef(key="progress", header="Progress", width=20, extract=_extract_progress))
-    registry.register(ColumnDef(key="links", header="Links", width=0, extract=_extract_links))
+
+    # Map of all available extractors
+    extractors = {
+        "#": _extract_index,
+        "status": _extract_status,
+        "agent": _extract_agent,
+        "goal": _extract_goal,
+        "progress": _extract_progress,
+        "links": _extract_links,
+    }
+
+    # Default defaults if no config provided
+    defaults = [
+        {"key": "#", "header": "#", "width": 3},
+        {"key": "status", "header": "Status", "width": 12},
+        {"key": "agent", "header": "Agent", "width": 10},
+        {"key": "goal", "header": "Goal", "width": 0},
+        {"key": "progress", "header": "Progress", "width": 20},
+        {"key": "links", "header": "Links", "width": 0},
+    ]
+
+    # Use config columns if available, otherwise defaults
+    column_configs = defaults
+    if config and config.columns:
+        column_configs = config.columns
+
+    for col_cfg in column_configs:
+        key = col_cfg.get("key")
+        if not key or key not in extractors:
+            continue
+
+        # Skip if explicitly hidden
+        if not col_cfg.get("visible", True):
+            continue
+
+        registry.register(
+            ColumnDef(
+                key=key,
+                header=col_cfg.get("header", key.capitalize()),
+                width=col_cfg.get("width", 0),
+                extract=extractors[key],
+            )
+        )
+
     return registry
