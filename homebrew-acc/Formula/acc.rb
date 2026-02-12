@@ -3,8 +3,8 @@ class Acc < Formula
 
   desc "Agent Command Center — monitor and manage AI coding agent sessions"
   homepage "https://github.com/chuyang-deng/acc"
-  url "https://github.com/chuyang-deng/acc/archive/refs/tags/v0.1.4.tar.gz"
-  sha256 "293c3d9334acd9e06eb5161b005eae34e14af6efca10bfb4df75119840f6c891"
+  url "https://github.com/chuyang-deng/acc/archive/refs/tags/v0.1.6.tar.gz"
+  sha256 "5dbe47db52b9a63ef9d44e85d9055125cf4e92b2c4a3c44775617b0e98cefd00"
   license "AGPL-3.0-only"
 
   depends_on "python@3.11"
