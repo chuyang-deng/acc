@@ -409,10 +409,9 @@ class CCCApp(App):
         self.notifications.clear_attention(session.pane_id)
         session.needs_attention_notified = False
 
-        # Switch tmux to the agent's window/pane. ccc stays alive —
-        # user returns with Ctrl-b l (last window) or Ctrl-b <number>.
-        subprocess.run(["tmux", "select-window", "-t", session.pane_id], check=False)
-        subprocess.run(["tmux", "select-pane", "-t", session.pane_id], check=False)
+        # Exit the TUI, then __main__.py will switch the tmux window
+        # and restart ccc so it's ready when the user comes back.
+        self.exit(result=("jump", session.pane_id, session.session_name))
 
     def action_send_input(self) -> None:
         """Open input dialog to send text to the selected session."""
