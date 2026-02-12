@@ -25,17 +25,17 @@ brew install acc
 
 Using **pipx** (application isolation):
 ```bash
-pipx install git+https://github.com/chuyangdeng/acc.git
+pipx install git+https://github.com/chuyang-deng/acc.git
 ```
 
 Using **uv**:
 ```bash
-uv tool install git+https://github.com/chuyangdeng/acc.git
+uv tool install git+https://github.com/chuyang-deng/acc.git
 ```
 
 Using **pip**:
 ```bash
-pip install git+https://github.com/chuyangdeng/acc.git
+pip install git+https://github.com/chuyang-deng/acc.git
 ```
 
 ### Developer / Local Install
