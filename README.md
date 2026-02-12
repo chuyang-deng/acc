@@ -17,6 +17,12 @@ A Python+Textual TUI that monitors and manages independent AI coding agent sessi
 
 ### User Install (Recommended)
 
+Using **Homebrew**:
+```bash
+brew tap chuyang-deng/acc
+brew install acc
+```
+
 Using **pipx** (application isolation):
 ```bash
 pipx install git+https://github.com/chuyangdeng/acc.git
