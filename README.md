@@ -89,3 +89,23 @@ agents:
 uv sync
 uv run pytest tests/ -v
 ```
+
+## Verification
+
+To verify the installation and functionality:
+
+1. **Start a test session:**
+   ```bash
+   tmux new-session -d -s test-ccc "echo 'Simulating agent...'; sleep 3600"
+   ```
+
+2. **Run ccc:**
+   ```bash
+   ccc
+   ```
+   You should see the "Simon Says..." session listed.
+
+3. **Interact:**
+   - Use `Up`/`Down` to select the session.
+   - Press `i` to send input (e.g., `ls -la`) directly.
+   - Press `Enter` to attach to the full tmux session (take control).

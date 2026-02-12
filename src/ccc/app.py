@@ -497,5 +497,8 @@ def _attach_to_tmux_pane(pane_id: str, session_name: str) -> None:
     subprocess.run(["tmux", "select-window", "-t", pane_id], check=False)
     subprocess.run(["tmux", "select-pane", "-t", pane_id], check=False)
 
-    # Attach to the session
-    subprocess.run(["tmux", "attach-session", "-t", session_name], check=False)
+    # If running inside tmux, switch client; otherwise attach
+    if os.environ.get("TMUX"):
+        subprocess.run(["tmux", "switch-client", "-t", session_name], check=False)
+    else:
+        subprocess.run(["tmux", "attach-session", "-t", session_name], check=False)
