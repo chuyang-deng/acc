@@ -5,6 +5,7 @@ from __future__ import annotations
 from textual.widgets import DataTable
 from textual.message import Message
 
+from ccc.columns import ColumnDef, DEFAULT_COLUMNS
 from ccc.discovery import Session
 from ccc.status import SessionStatus
 
@@ -18,7 +19,7 @@ class SessionSelected(Message):
 
 
 class SessionTable(DataTable):
-    """DataTable showing all tracked Claude sessions."""
+    """DataTable showing all tracked sessions, driven by ColumnDef plugins."""
 
     DEFAULT_CSS = """
     SessionTable {
@@ -32,13 +33,17 @@ class SessionTable(DataTable):
     }
     """
 
-    def __init__(self) -> None:
+    def __init__(self, columns: list[ColumnDef] | None = None) -> None:
         super().__init__(cursor_type="row", zebra_stripes=True)
-        self._sessions_by_row: dict[int, Session] = {}
+        self._columns = columns or DEFAULT_COLUMNS
         self._session_list: list[Session] = []
 
     def on_mount(self) -> None:
-        self.add_columns("#", "Status", "Goal", "Progress", "Links")
+        for col in self._columns:
+            if col.width > 0:
+                self.add_column(col.header, key=col.key, width=col.width)
+            else:
+                self.add_column(col.header, key=col.key)
 
     def refresh_sessions(self, sessions: dict[str, Session]) -> None:
         """Update the table with the current session list."""
@@ -48,38 +53,10 @@ class SessionTable(DataTable):
         prev_cursor = self.cursor_row
 
         self.clear()
-        self._sessions_by_row.clear()
 
         for idx, session in enumerate(self._session_list):
-            status_text = f"{session.status.icon} {session.status.label}"
-
-            # Truncate goal/progress for table display
-            goal = (session.goal or "—")[:35]
-            progress = (session.progress or "—")[:20]
-
-            # Format links
-            if session.links:
-                links_text = ", ".join(
-                    f"{ln.icon}{ln.label}" for ln in session.links[:3]
-                )
-            else:
-                links_text = "—"
-
-            # Style for attention rows
-            label_style = ""
-            if session.status == SessionStatus.NEEDS_ATTENTION:
-                label_style = "bold red"
-            elif session.status == SessionStatus.CRASHED:
-                label_style = "bold magenta"
-
-            row_key = self.add_row(
-                str(idx + 1),
-                status_text,
-                goal,
-                progress,
-                links_text,
-            )
-            self._sessions_by_row[idx] = session
+            cells = [col.extract(session, idx) for col in self._columns]
+            self.add_row(*cells)
 
         # Restore cursor position
         if self._session_list and prev_cursor < len(self._session_list):

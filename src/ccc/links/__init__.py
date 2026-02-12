@@ -20,10 +20,12 @@ class LinkRegistry:
             GitHubRepoPlugin(),
             LinearPlugin(),
             LocalhostPlugin(),
-            GenericURLPlugin(),  # catch-all — must be last
         ]
+        # Custom plugins go before the generic catch-all
         if custom_link_configs:
             self.plugins.extend(load_custom_plugins(custom_link_configs))
+        # Generic URL catch-all must be last
+        self.plugins.append(GenericURLPlugin())
 
     def scan(self, text: str) -> list[DetectedLink]:
         """Scan text for all matching links across all plugins."""
