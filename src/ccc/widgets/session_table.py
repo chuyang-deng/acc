@@ -5,7 +5,7 @@ from __future__ import annotations
 from textual.widgets import DataTable
 from textual.message import Message
 
-from ccc.columns import ColumnDef, DEFAULT_COLUMNS
+from ccc.columns import ColumnRegistry, create_default_registry
 from ccc.discovery import Session
 from ccc.status import SessionStatus
 
@@ -19,7 +19,7 @@ class SessionSelected(Message):
 
 
 class SessionTable(DataTable):
-    """DataTable showing all tracked sessions, driven by ColumnDef plugins."""
+    """DataTable showing all tracked sessions, driven by a ColumnRegistry."""
 
     DEFAULT_CSS = """
     SessionTable {
@@ -33,13 +33,13 @@ class SessionTable(DataTable):
     }
     """
 
-    def __init__(self, columns: list[ColumnDef] | None = None) -> None:
+    def __init__(self, registry: ColumnRegistry | None = None) -> None:
         super().__init__(cursor_type="row", zebra_stripes=True)
-        self._columns = columns or DEFAULT_COLUMNS
+        self._registry = registry or create_default_registry()
         self._session_list: list[Session] = []
 
     def on_mount(self) -> None:
-        for col in self._columns:
+        for col in self._registry.columns:
             if col.width > 0:
                 self.add_column(col.header, key=col.key, width=col.width)
             else:
@@ -48,14 +48,11 @@ class SessionTable(DataTable):
     def refresh_sessions(self, sessions: dict[str, Session]) -> None:
         """Update the table with the current session list."""
         self._session_list = list(sessions.values())
-
-        # Remember current cursor position
         prev_cursor = self.cursor_row
-
         self.clear()
 
         for idx, session in enumerate(self._session_list):
-            cells = [col.extract(session, idx) for col in self._columns]
+            cells = [col.extract(session, idx) for col in self._registry.columns]
             self.add_row(*cells)
 
         # Restore cursor position
