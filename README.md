@@ -107,6 +107,63 @@ agents:
 | `ACC_REFRESH_INTERVAL` | `3` | Poll interval (seconds) |
 | `ACC_SUMMARY_INTERVAL` | `60` | LLM re-summarization interval |
 | `ACC_MODEL` | `haiku` | Model for summarization |
+| `ACC_LLM_API_KEY` | - | Custom API key (optional) |
+| `ACC_LLM_BASE_URL` | - | Custom LLM base URL (optional) |
+
+## Advanced Configuration
+
+### Columns
+
+Customize the session table columns:
+
+```yaml
+columns:
+  - key: "#"
+    width: 3
+  - key: "status"
+    width: 12
+  - key: "agent" 
+    width: 10
+  - key: "goal"
+    width: 0 # flexible width
+  # Omit columns to hide them
+```
+
+### LLM Configuration
+
+Use a local LLM or a different provider compatible with Anthropic client (or just set the key):
+
+```yaml
+llm_api_key: "sk-..."
+llm_base_url: "https://api.anthropic.com" # or local proxy
+summary_model: "claude-3-opus-20240229"
+```
+
+### Custom Links
+
+Add regex patterns to detect custom IDs or URLs:
+
+```yaml
+links:
+  - name: "jira"
+    icon: "🎫"
+    pattern: "PROJ-\\d+"
+    label: "Jira"
+```
+
+### Custom Agents
+
+Teach `acc` to recognize other agents or processes:
+
+```yaml
+agents:
+  - name: "MyAgent"
+    process_names: ["run_agent.py"]
+    working_patterns:
+      - "Thinking..."
+    attention_patterns:
+      - "User input required:"
+```
 
 ## Development
 
