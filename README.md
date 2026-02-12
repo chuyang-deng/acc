@@ -15,12 +15,31 @@ A Python+Textual TUI that monitors and manages independent AI coding agent sessi
 
 ## Install
 
-```bash
-# From source
-uv tool install .
+### User Install (Recommended)
 
-# Or run directly
-uv run acc
+Using **pipx** (application isolation):
+```bash
+pipx install git+https://github.com/chuyangdeng/acc.git
+```
+
+Using **uv**:
+```bash
+uv tool install git+https://github.com/chuyangdeng/acc.git
+```
+
+Using **pip**:
+```bash
+pip install git+https://github.com/chuyangdeng/acc.git
+```
+
+### Developer / Local Install
+
+```bash
+# From source folder
+pip install -e .
+
+# Or using uv
+uv tool install .
 ```
 
 ## Usage
