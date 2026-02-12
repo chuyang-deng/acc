@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ccc.links.base import DetectedLink, LinkPlugin
-from ccc.links.github import GitHubIssuePlugin, GitHubPRPlugin
+from ccc.links.github import GitHubIssuePlugin, GitHubPRPlugin, GitHubRepoPlugin
 from ccc.links.linear import LinearPlugin
 from ccc.links.localhost import LocalhostPlugin
 from ccc.links.custom import load_custom_plugins
@@ -16,6 +16,7 @@ class LinkRegistry:
         self.plugins: list[LinkPlugin] = [
             GitHubPRPlugin(),
             GitHubIssuePlugin(),
+            GitHubRepoPlugin(),  # generic fallback for any github URL
             LinearPlugin(),
             LocalhostPlugin(),
         ]
