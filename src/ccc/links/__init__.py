@@ -6,6 +6,7 @@ from ccc.links.base import DetectedLink, LinkPlugin
 from ccc.links.github import GitHubIssuePlugin, GitHubPRPlugin, GitHubRepoPlugin
 from ccc.links.linear import LinearPlugin
 from ccc.links.localhost import LocalhostPlugin
+from ccc.links.generic import GenericURLPlugin
 from ccc.links.custom import load_custom_plugins
 
 
@@ -16,9 +17,10 @@ class LinkRegistry:
         self.plugins: list[LinkPlugin] = [
             GitHubPRPlugin(),
             GitHubIssuePlugin(),
-            GitHubRepoPlugin(),  # generic fallback for any github URL
+            GitHubRepoPlugin(),
             LinearPlugin(),
             LocalhostPlugin(),
+            GenericURLPlugin(),  # catch-all — must be last
         ]
         if custom_link_configs:
             self.plugins.extend(load_custom_plugins(custom_link_configs))
