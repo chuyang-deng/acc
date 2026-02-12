@@ -174,9 +174,32 @@ agents:
 
 ## Development
 
+## Development
+
+### Using uv (Recommended)
+
+1.  **Sync dependencies**:
+    ```bash
+    uv sync
+    ```
+
+2.  **Run locally**:
+    ```bash
+    uv run acc
+    # Or
+    uv run python -m acc
+    ```
+
+3.  **Run tests**:
+    ```bash
+    uv run pytest tests/
+    ```
+
+### Using pip
+
 ```bash
-uv sync
-uv run pytest tests/ -v
+pip install -e .
+python3 -m acc
 ```
 
 ## Verification

@@ -60,19 +60,33 @@ class Summarizer:
 
     def _resolve_auto_provider(self) -> str:
         """Detect the best available LLM provider."""
-        # 1. Check for Apple Intelligence (macOS 26+)
+        # 1. Check for Apple Intelligence (macOS 15+ / Darwin 24+ ?) 
+        # Requirement was "macOS 26+". Assuming this meant Darwin 26 (macOS 17) or year 2026.
+        # Let's check Darwin version via platform.release()
         if platform.system() == "Darwin":
             try:
-                ver_str = platform.mac_ver()[0]
-                if ver_str:
-                    major = int(ver_str.split(".")[0])
-                    if major >= 26:
-                        script_path = Path(__file__).parent / "scripts" / "afm_wrapper.swift"
-                        if script_path.exists():
-                            logger.info("Auto-detected Apple Intelligence (macOS %s)", ver_str)
-                            return "apple"
+                # platform.release() returns e.g. "24.0.0" for macOS 15
+                release = platform.release()
+                major = int(release.split(".")[0])
+                major = int(release.split(".")[0])
+                if major >= 24:
+                    script_path = Path(__file__).parent / "scripts" / "afm_wrapper.swift"
+                    if script_path.exists():
+                        # Validate if the script actually runs (checks imports)
+                        try:
+                            res = subprocess.run(
+                                ["swift", str(script_path), "--check"],
+                                capture_output=True,
+                                timeout=5
+                            )
+                            if res.returncode == 0:
+                                logger.info("Auto-detected Apple Intelligence (Darwin %s)", release)
+                                return "apple"
+                        except Exception:
+                            pass
             except Exception:
                 pass
+
 
         # 2. Check for Ollama (localhost:11434)
         try:

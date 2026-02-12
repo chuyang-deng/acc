@@ -14,7 +14,7 @@ class LocalhostPlugin(LinkPlugin):
         super().__init__(
             name="localhost",
             icon="🌐",
-            pattern=r"https?://localhost:\d+[^\s]*",
+            pattern=r"https?://localhost:\d+[^\s\"']*",
             label_fn=self._label,
         )
 

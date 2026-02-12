@@ -28,6 +28,11 @@ func generate(prompt: String) async {
 // Main entry point
 if #available(macOS 26.0, *) {
     let args = CommandLine.arguments
+    if args.count > 1 && args[1] == "--check" {
+        // Just checking if we can import and run.
+        exit(0)
+    }
+
     guard args.count > 1 else {
         print("Usage: afm-wrapper <prompt>")
         exit(1)
