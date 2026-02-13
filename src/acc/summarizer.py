@@ -7,7 +7,8 @@ import time
 import subprocess
 import platform
 import urllib.request
-from dataclasses import dataclass
+import json
+from dataclasses import dataclass, asdict
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -55,8 +56,36 @@ class Summarizer:
         self.api_key = api_key
         self.base_url = base_url
         self.provider = provider.lower()
-        self._cache: dict[str, SessionSummary] = {}
+        self.provider = provider.lower()
+        self._cache_file = Path.home() / ".acc" / "cache.json"
+        self._cache: dict[str, SessionSummary] = self._load_cache()
         self._client = None
+
+    def _load_cache(self) -> dict[str, SessionSummary]:
+        """Load summarized sessions from disk."""
+        if not self._cache_file.exists():
+            return {}
+        try:
+            with open(self._cache_file, "r") as f:
+                data = json.load(f)
+            
+            cache = {}
+            for pane_id, summary_data in data.items():
+                cache[pane_id] = SessionSummary(**summary_data)
+            return cache
+        except Exception as e:
+            logger.warning("Failed to load cache: %s", e)
+            return {}
+
+    def _save_cache(self) -> None:
+        """Save summaries to disk."""
+        try:
+            self._cache_file.parent.mkdir(parents=True, exist_ok=True)
+            data = {k: asdict(v) for k, v in self._cache.items()}
+            with open(self._cache_file, "w") as f:
+                json.dump(data, f)
+        except Exception as e:
+            logger.warning("Failed to save cache: %s", e)
 
     def _resolve_auto_provider(self) -> str:
         """Detect the best available LLM provider."""
@@ -208,6 +237,7 @@ class Summarizer:
             summary = self._parse_response(text)
             summary.timestamp = time.time()
             self._cache[pane_id] = summary
+            self._save_cache()
             return summary
 
         except Exception as e:
@@ -216,7 +246,8 @@ class Summarizer:
 
     def invalidate(self, pane_id: str) -> None:
         """Remove cached summary for a pane."""
-        self._cache.pop(pane_id, None)
+        if self._cache.pop(pane_id, None):
+            self._save_cache()
 
     @staticmethod
     def _parse_response(text: str) -> SessionSummary:

@@ -11,7 +11,7 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Vertical
 from textual.screen import ModalScreen
-from textual.widgets import Footer, Input, Label, Static
+from textual.widgets import ContentSwitcher, Footer, Input, Label, Static
 
 from acc.agents import AgentRegistry
 from acc.columns import create_default_registry
@@ -24,6 +24,7 @@ from acc.status import SessionStatus, content_changed, detect_status
 from acc.summarizer import Summarizer
 from acc.widgets.detail_panel import DetailPanel
 from acc.widgets.header import ACCHeader
+from acc.widgets.grid import SessionGrid
 from acc.widgets.session_table import SessionSelected, SessionTable
 
 
@@ -376,6 +377,7 @@ class ACCApp(App):
         Binding("r", "refresh", "Refresh"),
         Binding("j", "cursor_down", "Down", show=False),
         Binding("k", "cursor_up", "Up", show=False),
+        Binding("g", "toggle_view", "Grid/List"),
         Binding("?", "help", "Help", key_display="?"),
     ]
 
@@ -400,7 +402,9 @@ class ACCApp(App):
     def compose(self) -> ComposeResult:
         yield ACCHeader()
         with Vertical(id="main-container"):
-            yield SessionTable(registry=create_default_registry(self.config))
+            with ContentSwitcher(initial="table-view", id="switcher"):
+                yield SessionTable(registry=create_default_registry(self.config), id="table-view")
+                yield SessionGrid(id="grid-view")
             yield DetailPanel()
         yield Footer()
 
@@ -480,7 +484,16 @@ class ACCApp(App):
             table = self.query_one(SessionTable)
             table.refresh_sessions(sessions)
 
+            try:
+                grid = self.query_one(SessionGrid)
+                grid.refresh_sessions(sessions)
+            except Exception:
+                pass
+
             # Update detail panel for current selection
+            # Only if table is visible? 
+            # If grid is visible, selection might not sync yet.
+            # For now, let's keep detail panel updating based on table selection.
             selected = table.get_selected_session()
             detail = self.query_one(DetailPanel)
             detail.show_session(selected)
@@ -608,6 +621,14 @@ class ACCApp(App):
     def action_help(self) -> None:
         """Show the help screen."""
         self.push_screen(HelpScreen())
+
+    def action_toggle_view(self) -> None:
+        """Toggle between list and grid view."""
+        switcher = self.query_one("#switcher", ContentSwitcher)
+        if switcher.current == "table-view":
+            switcher.current = "grid-view"
+        else:
+            switcher.current = "table-view"
 
 
 def _attach_to_tmux_pane(pane_id: str, session_name: str) -> None:
