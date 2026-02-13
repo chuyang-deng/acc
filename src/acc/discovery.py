@@ -152,7 +152,6 @@ def discover_panes(agent_registry: AgentRegistry) -> list[Session]:
             agent_running=agent_running,
             agent_name=detector.name if detector else "",
             detector=detector,
-            detector=detector,
         )
         sessions.append(session)
         logger.debug("Discovered session: %s (agent=%s)", pane_id, agent_running)
