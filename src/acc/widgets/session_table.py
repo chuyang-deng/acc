@@ -33,8 +33,8 @@ class SessionTable(DataTable):
     }
     """
 
-    def __init__(self, registry: ColumnRegistry | None = None) -> None:
-        super().__init__(cursor_type="row", zebra_stripes=True)
+    def __init__(self, registry: ColumnRegistry | None = None, **kwargs) -> None:
+        super().__init__(cursor_type="row", zebra_stripes=True, **kwargs)
         self._registry = registry or create_default_registry()
         self._session_list: list[Session] = []
 
