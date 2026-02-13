@@ -96,8 +96,8 @@ class SessionGrid(Vertical):
     }
     """
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
         self.cards: dict[str, SessionCard] = {}
 
     def compose(self) -> ComposeResult:
