@@ -6,7 +6,10 @@ import subprocess
 import time
 from dataclasses import dataclass, field
 
+import logging
 import psutil
+
+logger = logging.getLogger("acc.discovery")
 
 from acc.agents import AgentDetector, AgentRegistry
 from acc.links import DetectedLink
@@ -35,7 +38,9 @@ class Session:
     last_output_time: float = field(default_factory=time.time)
     last_content_hash: int = 0
     needs_attention_notified: bool = False
+    needs_attention_notified: bool = False
     spawned_by_ccc: bool = False
+    content_preview: str = ""
 
     @property
     def display_name(self) -> str:
@@ -109,8 +114,10 @@ def discover_panes(agent_registry: AgentRegistry) -> list[Session]:
         "-F", "#{session_name}:#{window_index}.#{pane_index} #{pane_pid}",
     )
     if not output:
+        logger.debug("No output from tmux list-panes")
         return []
 
+    logger.debug("tmux list-panes output:\n%s", output)
     sessions: list[Session] = []
     for line in output.splitlines():
         line = line.strip()
@@ -145,8 +152,10 @@ def discover_panes(agent_registry: AgentRegistry) -> list[Session]:
             agent_running=agent_running,
             agent_name=detector.name if detector else "",
             detector=detector,
+            detector=detector,
         )
         sessions.append(session)
+        logger.debug("Discovered session: %s (agent=%s)", pane_id, agent_running)
 
     return sessions
 
@@ -168,6 +177,7 @@ class SessionRegistry:
 
     def track_spawned(self, pane_id: str) -> None:
         """Mark a pane as spawned by ccc so we keep tracking it."""
+        logger.info("Tracking spawned pane: %s", pane_id)
         self._spawned_pane_ids.add(pane_id)
 
     def update(self, discovered: list[Session]) -> dict[str, Session]:
@@ -207,6 +217,9 @@ class SessionRegistry:
             else:
                 if new_session.pane_id in self._spawned_pane_ids:
                     new_session.spawned_by_ccc = True
+                if new_session.pane_id in self._spawned_pane_ids:
+                    new_session.spawned_by_ccc = True
                 self.sessions[new_session.pane_id] = new_session
+                logger.debug("Added new session: %s", new_session.pane_id)
 
         return self.sessions

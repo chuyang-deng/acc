@@ -434,6 +434,7 @@ class ACCApp(App):
         # Update each session's status, links, and summary
         for pane_id, session in sessions.items():
             content = capture_pane(pane_id, lines=50)
+            session.content_preview = content
             changed, new_hash = content_changed(session.last_content_hash, content)
 
             if changed:

@@ -2,8 +2,16 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import subprocess
+
+logging.basicConfig(
+    filename="acc_debug.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger("acc.spawner")
 
 from acc.config import ACCConfig
 
@@ -72,6 +80,7 @@ def spawn_session(
 
     # Ensure the tmux session exists
     if not _ensure_session(session_name):
+        logger.error("Failed to ensure session %s", session_name)
         return None
 
     # Create new window
@@ -94,7 +103,9 @@ def spawn_session(
     )
 
     if result.returncode != 0:
+        logger.error("tmux new-window failed: %s", result.stderr)
         return None
 
     pane_id = result.stdout.strip()
+    logger.info("Spawned session %s window %s -> pane %s", session_name, window_name, pane_id)
     return pane_id or None

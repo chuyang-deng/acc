@@ -47,6 +47,18 @@ class SessionCard(Static):
     SessionCard .status-icon {
         width: 2;
     }
+
+    SessionCard .preview {
+        height: 12;
+        width: 100%;
+        overflow: hidden hidden;
+        background: #1e1e1e;
+        color: #cccccc;
+        border: solid $primary-darken-3;
+        margin-top: 1;
+        padding: 0 1;
+        text-opacity: 0.8;
+    }
     """
 
     def __init__(self, session: TrackedSession) -> None:
@@ -63,6 +75,10 @@ class SessionCard(Static):
         
         progress = self.session.progress or "No progress detected"
         yield Label(f"Progress: {progress}", classes="progress")
+        
+        # Terminal preview
+        preview_text = self.session.content_preview or ""
+        yield Static(preview_text, classes="preview", markup=False)
 
     def update_session(self, session: TrackedSession) -> None:
         """Update the card with new session data."""
@@ -73,8 +89,10 @@ class SessionCard(Static):
         # Querying them is better.
         try:
             self.query_one(".header", Label).update(f"{session.status.icon} {session.display_name}")
+            self.query_one(".header", Label).update(f"{session.status.icon} {session.display_name}")
             self.query_one(".goal", Label).update(f"Goal: {session.goal or 'No goal detected'}")
             self.query_one(".progress", Label).update(f"Progress: {session.progress or 'No progress detected'}")
+            self.query_one(".preview", Static).update(session.content_preview or "")
         except Exception:
             pass
 
