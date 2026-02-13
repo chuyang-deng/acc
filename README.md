@@ -174,8 +174,6 @@ agents:
 
 ## Development
 
-## Development
-
 ### Using uv (Recommended)
 
 1.  **Sync dependencies**:
