@@ -7,7 +7,7 @@ from textual.containers import Grid, Vertical
 from textual.reactive import reactive
 from textual.widgets import Label, Static
 
-from acc.discovery import TrackedSession
+from acc.discovery import Session as TrackedSession
 
 
 class SessionCard(Static):
